@@ -1,14 +1,25 @@
- name: geek_paytask
-description: Geek Paytask watch earn
+
+name: geekpaytask
+description: GeekPayTask watch earn
 publish_to: 'none'
 version: 1.0.0+1
+
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: '>=3.0.0 <4.0.0'
+
 dependencies:
   flutter:
     sdk: flutter
+  cupertino_icons: ^1.0.6
   firebase_core: ^2.24.0
   cloud_firestore: ^4.15.0
   firebase_auth: ^4.15.0
   google_mobile_ads: ^4.0.0
-  flutter_paystack: ^1.0.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
