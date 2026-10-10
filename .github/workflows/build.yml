@@ -1,23 +1,88 @@
-name: Build APK
-on: [push]
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v5
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.22.0'
-          channel: 'stable'
-      - run: flutter pub get
-      - run: rm -rf android
-      - run: flutter create . --platforms android --org com.example --project-name geekpaytask
-      - run: flutter build apk --debug
-      - uses: actions/upload-artifact@v4
-        with:
-          name: apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000">
+
+    <VideoView android:id="@+id/videoView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="38dp"
+        android:layout_margin="10dp" android:background="@drawable/bg_search"
+        android:gravity="center_vertical" android:padding="10dp">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="🔍  Search videos you want to watch..." android:textColor="#AAA"/>
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical" android:layout_marginEnd="10dp"
+        android:orientation="vertical" android:gravity="center">
+
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center" android:layout_marginBottom="15dp">
+            <ImageView android:layout_width="46dp" android:layout_height="46dp" android:src="@drawable/ic_profile"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Follow" android:textColor="#FFF" android:textSize="11sp"/>
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center" android:layout_marginBottom="15dp">
+            <ImageView android:layout_width="38dp" android:layout_height="38dp" android:src="@drawable/ic_heart_green" android:background="@drawable/bg_circle_dark" android:padding="7dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="128.4K" android:textColor="#FFF" android:textSize="12sp"/>
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center" android:layout_marginBottom="15dp">
+            <ImageView android:layout_width="38dp" android:layout_height="38dp" android:src="@drawable/ic_comment" android:background="@drawable/bg_circle_dark" android:padding="7dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="3,921" android:textColor="#FFF" android:textSize="12sp"/>
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center" android:layout_marginBottom="15dp">
+            <ImageView android:layout_width="38dp" android:layout_height="38dp" android:src="@drawable/ic_bookmark" android:background="@drawable/bg_circle_dark" android:padding="7dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="892" android:textColor="#FFF" android:textSize="12sp"/>
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+            <ImageView android:layout_width="38dp" android:layout_height="38dp" android:src="@drawable/ic_share" android:background="@drawable/bg_circle_dark" android:padding="7dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Share" android:textColor="#FFF" android:textSize="11sp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_gravity="bottom" android:background="#0D1A12" android:orientation="vertical" android:paddingTop="6dp">
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="58dp" android:orientation="horizontal" android:weightSum="6">
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_home"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Home" android:textColor="#FFF" android:textSize="9sp"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_posting"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Posting" android:textColor="#FFF" android:textSize="9sp"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_more_money"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="More Money" android:textColor="#FFF" android:textSize="9sp"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1.5" android:gravity="center" android:orientation="vertical" android:background="@drawable/bg_recharge">
+                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:src="@drawable/ic_recharge"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Recharge" android:textColor="#00FF66" android:textSize="10sp" android:textStyle="bold"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_football"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Football" android:textColor="#FFF" android:textSize="9sp"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_call"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Call" android:textColor="#FFF" android:textSize="9sp"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="© 2024 Geek Paytask • geektask.com" android:textColor="#66FFFFFF"
+            android:textSize="8sp" android:gravity="center" android:paddingBottom="4dp"/>
+    </LinearLayout>
+</FrameLayout>
