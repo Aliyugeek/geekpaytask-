@@ -658,9 +658,20 @@ class VideoSearch extends SearchDelegate<String> {
   Widget buildResults(BuildContext context) => Center(
         child: Text('Video search for: $query'),
       );
+class VideoSearch extends SearchDelegate<String> {
+  @override
+  List<Widget> buildActions(BuildContext context) => [
+        IconButton(onPressed: () => query = '', icon: const Icon(Icons.clear))
+      ];
 
   @override
-  Widget buildSuggestions(BuildContext context) => const Center(
-        child: Text('Search Geek PayTask videos'),
-      );
+  Widget buildLeading(BuildContext context) => IconButton(
+      onPressed: () => close(context, ''), icon: const Icon(Icons.arrow_back));
+
+  @override
+  Widget buildResults(BuildContext context) => Center(child: Text('Search: $query'));
+  
+  @override
+  Widget buildSuggestions(BuildContext context) => const Center(child: Text('Type to search videos'));
 }
+  
