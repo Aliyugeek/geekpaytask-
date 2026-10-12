@@ -1,4 +1,22 @@
+name: geekpaytask
+description: A new Flutter project.
+publish_to: 'none'
+version: 1.0.0+1
+environment:
+  sdk: '^3.5.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.3
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+flutter:
+  uses-material-design: true
+*2. Second, fix your `build.yml`*
 
+Go to `.github/workflows/build.yml`, delete everything, paste this:
 name: Build APK
 on:
   push:
@@ -18,20 +36,6 @@ jobs:
           channel: 'stable'
       - run: rm -rf android
       - run: flutter create . --platforms=android
-      - name: Fix pubspec.yaml SDK
-        run: |
-          cat pubspec.yaml
-          python3 -c "
-          import pathlib
-          p = pathlib.Path('pubspec.yaml').read_text()
-          if \"sdk:\" not in p:
-              p = p.replace('environment:', \"environment:\n  sdk: '^3.5.0'\")
-          else:
-              import re
-              p = re.sub(r'environment:\s*\n\s*sdk:.*', \"environment:\n  sdk: '^3.5.0'\", p)
-          pathlib.Path('pubspec.yaml').write_text(p)
-          print(p)
-          "
       - run: flutter pub get
       - run: flutter build apk --release
       - uses: actions/upload-artifact@v4
