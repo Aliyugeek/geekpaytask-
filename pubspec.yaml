@@ -15,11 +15,11 @@ jobs:
         with:
           flutter-version: '3.24.5'
           channel: 'stable'
-      - name: Fix project
+      - name: Recreate clean project
         run: |
           cat > pubspec.yaml <<'EOF'
           name: geekpaytask
-          description: A new Flutter project.
+          description: GeekPay Task.
           publish_to: 'none'
           version: 1.0.0+1
           environment:
@@ -38,14 +38,30 @@ jobs:
           rm -rf android
           flutter create --platforms=android --project-name geekpaytask /tmp/newapp
           cp -r /tmp/newapp/android ./
+          chmod +x android/gradlew
           mkdir -p lib
-          if [ ! -f lib/main.dart ]; then
-            echo "import 'package:flutter/material.dart'; void main(){runApp(MaterialApp(home:Scaffold(body:Center(child:Text('GeekPay')))));}" > lib/main.dart
-          fi
+          cat > lib/main.dart <<'EOF'
+          import 'package:flutter/material.dart';
+          void main() => runApp(const MyApp());
+          class MyApp extends StatelessWidget {
+            const MyApp({super.key});
+            @override
+            Widget build(BuildContext context) {
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                home: Scaffold(
+                  body: Center(child: Text('GeekPay Task Working', style: TextStyle(fontSize: 24))),
+                ),
+              );
+            }
+          }
+          EOF
+      - run: flutter clean
       - run: flutter pub get
-      - run: flutter build apk --release
+      - run: flutter build apk --release --verbose
       - run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/geekpaytask.apk
       - uses: actions/upload-artifact@v4
         with:
           name: geekpaytask
           path: build/app/outputs/flutter-apk/geekpaytask.apk
+          
