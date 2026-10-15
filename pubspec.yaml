@@ -11,8 +11,6 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.6
   video_player: ^2.8.6
-  firebase_core: ^2.24.0
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
