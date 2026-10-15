@@ -1,37 +1,23 @@
-plugins {
-    id "com.android.application"
-    id "kotlin-android"
-    id "dev.flutter.flutter-gradle-plugin"
-}
-
-android {
-    namespace = "com.example.geekpaytask"
-    compileSdk = 34
-    ndkVersion = flutter.ndkVersion
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
-    }
-
-    defaultConfig {
-        applicationId = "com.example.geekpaytask"
-        minSdk = 21
-        targetSdk = 34
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
-    }
-
-    buildTypes {
-        release {
-            signingConfig = signingConfigs.debug
-        }
-    }
-}
-
-flutter {
-    source = "../.."
-}
+name: build
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.2'
+          channel: 'stable'
+      - run: flutter create . --platforms=android
+      - run: flutter pub get
+      - run: flutter build apk --release
+      - run: mv build/app/outputs/flutter-apk/app-release.apk geekpaytask.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: geekpaytask.apk
