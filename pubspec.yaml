@@ -20,5 +20,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: apk
-          path: geekpaytask.apk
-          
+          path: geekpaytask.app
