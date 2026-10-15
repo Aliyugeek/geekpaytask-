@@ -1,5 +1,5 @@
 name: geekpaytask
-description: Geek PayTask - Watch, Earn, Connect.
+description: Geek PayTask - Watch, Earn, Geek
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -11,6 +11,7 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.6
   video_player: ^2.8.6
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -18,5 +19,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/images/
