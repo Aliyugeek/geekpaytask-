@@ -1,6 +1,3 @@
-Name:
-.github/workflows/build.yml
-- Paste:
 name: build
 on: [push, workflow_dispatch]
 jobs:
