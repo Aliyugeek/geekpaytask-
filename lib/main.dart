@@ -473,4 +473,170 @@ class GKCallPage extends StatelessWidget {
       ],
     );
   }
+}class CityWarsGame extends StatefulWidget {
+  const CityWarsGame({super.key});
+
+  @override
+  State<CityWarsGame> createState() => _CityWarsGameState();
+}
+
+class _CityWarsGameState extends State<CityWarsGame> {
+  int score = 0;
+  int energy = 10;
+  bool gameOver = false;
+
+  void tapCity() {
+    if (gameOver) return;
+
+    setState(() {
+      score += 10;
+      energy--;
+
+      if (energy <= 0) {
+        gameOver = true;
+      }
+    });
+  }
+
+  void restartGame() {
+    setState(() {
+      score = 0;
+      energy = 10;
+      gameOver = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF050709),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF050709),
+        title: const Text(
+          'CITY WARS',
+          style: TextStyle(
+            color: Color(0xFF39FF55),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            const Text(
+              'CAPTURE THE CITY',
+              style: TextStyle(
+                color: Color(0xFF10C9FF),
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Score: $score',
+              style: const TextStyle(
+                color: Color(0xFF39FF55),
+                fontSize: 28,
+              ),
+            ),
+            Text(
+              'Energy: $energy',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+              ),
+            ),
+            const SizedBox(height: 30),
+            Expanded(
+              child: Center(
+                child: gameOver
+                    ? const Text(
+                        'GAME OVER!',
+                        style: TextStyle(
+                          color: Colors.redAccent,
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                    : GestureDetector(
+                        onTap: tapCity,
+                        child: Container(
+                          width: 220,
+                          height: 220,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF101820),
+                            border: Border.all(
+                              color: const Color(0xFF39FF55),
+                              width: 3,
+                            ),
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x5539FF55),
+                                blurRadius: 20,
+                              ),
+                            ],
+                          ),
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.location_city,
+                                color: Color(0xFF39FF55),
+                                size: 85,
+                              ),
+                              SizedBox(height: 12),
+                              Text(
+                                'TAP TO CAPTURE',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+              ),
+            ),
+            if (gameOver) ...[
+              Text(
+                'Final score: $score',
+                style: const TextStyle(
+                  color: Color(0xFF10C9FF),
+                  fontSize: 20,
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: restartGame,
+                child: const Text('PLAY AGAIN'),
+              ),
+            ],
+            const SizedBox(height: 20),
+            const Text(
+              'CITY WARS LEADERBOARD',
+              style: TextStyle(
+                color: Color(0xFF10C9FF),
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const ListTile(
+              leading: Icon(Icons.emoji_events, color: Colors.amber),
+              title: Text(
+                'Leaderboard',
+                style: TextStyle(color: Colors.white),
+              ),
+              subtitle: Text(
+                'Online rankings not connected yet',
+                style: TextStyle(color: Colors.white70),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
