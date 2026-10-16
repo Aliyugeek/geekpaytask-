@@ -1,4 +1,4 @@
-name: build
+ name: build
 on: [push, workflow_dispatch]
 jobs:
   build:
@@ -13,7 +13,7 @@ jobs:
         with:
           flutter-version: '3.22.2'
           channel: 'stable'
-      - run: flutter create . --platforms=android
+      - run: flutter create --project-name geekpaytask --platforms=android .
       - run: flutter pub get
       - run: flutter build apk --release
       - run: mv build/app/outputs/flutter-apk/app-release.apk geekpaytask.apk
