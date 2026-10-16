@@ -21,11 +21,3 @@ jobs:
         with:
           name: apk
           path: geekpaytask-app.apk
-- Commit
-
-*FILE 4: Your Firebase - `android/app/google-services.json`*
-
-- *Add file > Upload files*
-- Choose your `google-services.json` from phone
-- Before you commit, change the name for top to:
-android/app/google-services.json
