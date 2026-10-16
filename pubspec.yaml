@@ -1,14 +1,19 @@
 name: geekpaytask
 publish_to: 'none'
 version: 1.0.0+1
+
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+sdk: '>=3.0.0 <4.0.0'
+
 dependencies:
-  flutter:
-    sdk: flutter
-  firebase_core: ^2.24.2
-  firebase_auth: ^4.15.3
-  cloud_firestore: ^4.15.8
-  cupertino_icons: ^1.0.2
 flutter:
-  uses-material-design: true
+sdk: flutter
+
+firebase_core: ^2.24.2
+firebase_auth: ^4.15.3
+cloud_firestore: ^4.15.8
+google_mobile_ads: ^5.1.0
+cupertino_icons: ^1.0.2
+
+flutter:
+uses-material-design: true
