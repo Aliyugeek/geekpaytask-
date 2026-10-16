@@ -47,4 +47,3 @@ jobs:
         with:
           name: apk
           path: geekpaytask-app.apk
- 
