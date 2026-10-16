@@ -1,4 +1,4 @@
- name: build
+name: build
 on: [push, workflow_dispatch]
 jobs:
   build:
@@ -20,4 +20,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: apk
-          path: geekpaytask.apk
+          path: geekpaytask.apk 
