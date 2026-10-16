@@ -6,35 +6,24 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 const Color neonGreen = Color(0xFF39FF55);
 const Color neonBlue = Color(0xFF10C9FF);
 const Color darkBg = Color(0xFF050709);
-
-// Official Google Android TEST banner ID.
-const String admobBannerTestId =
-    'ca-app-pub-3940256099942544/6300978111';
-
-// Insert your own Paystack PUBLIC TEST key here.
-// This placeholder is not a working key.
-const String paystackPublicTestKey = 'pk_test_REPLACE_WITH_YOUR_KEY';
+const String admobBannerTestId = 'ca-app-pub-3940256099942544/6300978111';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp();
   await MobileAds.instance.initialize();
-
   try {
     if (FirebaseAuth.instance.currentUser == null) {
       await FirebaseAuth.instance.signInAnonymously();
     }
   } catch (e) {
-    debugPrint('Authentication setup: $e');
+    debugPrint('Auth: $e');
   }
-
   runApp(const GeekPayTaskApp());
 }
 
 class GeekPayTaskApp extends StatelessWidget {
   const GeekPayTaskApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -43,10 +32,6 @@ class GeekPayTaskApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark,
         scaffoldBackgroundColor: darkBg,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: neonGreen,
-          brightness: Brightness.dark,
-        ),
         useMaterial3: true,
       ),
       home: const GeekHome(),
@@ -56,7 +41,6 @@ class GeekPayTaskApp extends StatelessWidget {
 
 class GeekHome extends StatefulWidget {
   const GeekHome({super.key});
-
   @override
   State<GeekHome> createState() => _GeekHomeState();
 }
@@ -64,579 +48,146 @@ class GeekHome extends StatefulWidget {
 class _GeekHomeState extends State<GeekHome> {
   int selectedIndex = 0;
   double testBalance = 0;
-
-  final List<String> pageNames = [
-    'Home',
-    'Geek',
-    'Recharge',
-    'More Money',
-    'Football',
-    'GK Call',
-  ];
-
   @override
   Widget build(BuildContext context) {
     final pages = [
       const HomePage(),
       const GeekProfilePage(),
-      RechargePage(
-        balance: testBalance,
-        onTestRecharge: () {
-          setState(() => testBalance += 100);
-        },
-      ),
+      RechargePage(balance: testBalance, onTestRecharge: () => setState(() => testBalance += 100)),
       const MoreMoneyPage(),
       const FootballPage(),
       GKCallPage(balance: testBalance),
     ];
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: darkBg,
-        title: const Text(
-          'GEEK PAYTASK',
-          style: TextStyle(
-            color: neonGreen,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.5,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert, color: neonBlue),
-            onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                backgroundColor: const Color(0xFF101820),
-                builder: (context) => SafeArea(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ListTile(
-                        leading: const Icon(Icons.person),
-                        title: const Text('Geek Profile'),
-                        onTap: () {
-                          Navigator.pop(context);
-                          setState(() => selectedIndex = 1);
-                        },
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.account_balance_wallet),
-                        title: const Text('Wallet and withdrawals'),
-                        onTap: () {
-                          Navigator.pop(context);
-                          setState(() => selectedIndex = 2);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
+        title: const Text('GEEK PAYTASK', style: TextStyle(color: neonGreen, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
       ),
       body: pages[selectedIndex],
       bottomNavigationBar: NavigationBar(
         backgroundColor: const Color(0xFF101820),
-        indicatorColor: neonGreen.withValues(alpha: 0.15),
+        indicatorColor: neonGreen.withOpacity(0.15),
         selectedIndex: selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() => selectedIndex = index);
-        },
+        onDestinationSelected: (i) => setState(() => selectedIndex = i),
         destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            label: 'Home',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            label: 'Geek',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.add_card),
-            label: 'Recharge',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.monetization_on_outlined),
-            label: 'More Money',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.sports_soccer),
-            label: 'Football',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.call_outlined),
-            label: 'GK Call',
-          ),
+          NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
+          NavigationDestination(icon: Icon(Icons.person_outline), label: 'Geek'),
+          NavigationDestination(icon: Icon(Icons.add_card), label: 'Recharge'),
+          NavigationDestination(icon: Icon(Icons.monetization_on_outlined), label: 'More Money'),
+          NavigationDestination(icon: Icon(Icons.sports_soccer), label: 'Football'),
+          NavigationDestination(icon: Icon(Icons.call_outlined), label: 'GK Call'),
         ],
       ),
     );
   }
-}class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+}
 
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        const Text(
-          'For You     Following',
-          style: TextStyle(
-            fontSize: 20,
-            color: neonGreen,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 20),
-        Container(
-          height: 350,
-          decoration: BoxDecoration(
-            color: const Color(0xFF111820),
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: neonBlue),
-          ),
-          child: const Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.video_library, size: 65, color: neonGreen),
-                SizedBox(height: 12),
-                Text('Geek Paytask Video Feed'),
-                SizedBox(height: 8),
-                Text('Videos will appear here when connected.'),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        const Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Icon(Icons.favorite_border, color: neonGreen),
-            Icon(Icons.comment_outlined, color: neonBlue),
-            Icon(Icons.share_outlined, color: neonGreen),
-            Icon(Icons.person_add_alt, color: neonBlue),
-          ],
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          'Post a video',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: neonGreen),
-        ),
-      ],
-    );
+class VideoPost {
+  String id; String user; String caption; int likes; int comments; bool isLiked; List<String> commentList;
+  VideoPost({required this.id, required this.user, required this.caption, this.likes=12800, this.comments=1200, this.isLiked=false, List<String>? c}) : commentList=c?? ['Nice one! 🔥','GK to the world 💚'];
+}
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+  @override State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<VideoPost> posts = [
+    VideoPost(id: '1', user: '@sadiya_queen', caption: 'Life is better when you smile 💚 #GK #GoodVibes'),
+    VideoPost(id: '2', user: '@geek_boy', caption: 'Earn with GK PayTask today!'),
+    VideoPost(id: '3', user: '@aisha_vibes', caption: 'My first earning ₦20k from GK! #PayTask'),
+  ];
+  String fmt(int n) => n>=1000? '${(n/1000).toStringAsFixed(1)}K' : '$n';
+  void toggleLike(int i){ setState((){ if(posts[i].isLiked){ posts[i].likes--; posts[i].isLiked=false; } else { posts[i].likes++; posts[i].isLiked=true; } }); }
+  void openComments(int i){
+    final ctrl=TextEditingController();
+    showModalBottomSheet(context: context, backgroundColor: const Color(0xFF101820), isScrollControlled: true, builder: (ctx)=> StatefulBuilder(builder: (ctx,setSheet)=> Padding(padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom), child: Container(height: 400, padding: const EdgeInsets.all(12), child: Column(children: [
+      Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey, borderRadius: BorderRadius.circular(10))),
+      Text('${posts[i].comments} Comments', style: const TextStyle(color: neonGreen, fontWeight: FontWeight.bold)),
+      const Divider(color: Colors.grey),
+      Expanded(child: ListView.builder(itemCount: posts[i].commentList.length, itemBuilder: (c,j)=> ListTile(leading: const CircleAvatar(backgroundColor: neonGreen, child: Icon(Icons.person, color: Colors.black, size: 18)), title: Text(posts[i].commentList[j], style: const TextStyle(color: Colors.white)), subtitle: const Text('Just now', style: TextStyle(color: Colors.grey, fontSize: 10))))),
+      Row(children: [ Expanded(child: TextField(controller: ctrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Add comment...', border: OutlineInputBorder()))), IconButton(icon: const Icon(Icons.send, color: neonGreen), onPressed: (){ if(ctrl.text.isNotEmpty){ setState(()=> posts[i].commentList.add(ctrl.text)); setSheet(()=> posts[i].comments++); ctrl.clear(); } }) ])
+    ])))));
   }
+  void sharePost(int i){ ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Shared ${posts[i].user} video!'))); }
+  @override Widget build(BuildContext context) => Column(children: [
+    const Padding(padding: EdgeInsets.all(16), child: Row(children: [ Text('For You', style: TextStyle(fontSize: 20, color: neonGreen, fontWeight: FontWeight.bold)), SizedBox(width: 20), Text('Following', style: TextStyle(fontSize: 16, color: Colors.grey)), Spacer(), Icon(Icons.search, color: neonBlue) ])),
+    Expanded(child: PageView.builder(scrollDirection: Axis.vertical, itemCount: posts.length, itemBuilder: (ctx,index){
+      var p=posts[index];
+      return Container(margin: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFF111820), borderRadius: BorderRadius.circular(18), border: Border.all(color: neonBlue)), child: Stack(children: [
+        Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [ CircleAvatar(radius: 30, backgroundColor: neonGreen, child: Text(p.user[1].toUpperCase(), style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold))), const SizedBox(height: 10), Text(p.user, style: const TextStyle(color: neonGreen, fontWeight: FontWeight.bold)), Padding(padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8), child: Text(p.caption, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white))), const Icon(Icons.play_circle, size: 40, color: neonBlue) ])),
+        Positioned(right: 10, bottom: 20, child: Column(children: [
+          GestureDetector(onTap: ()=> toggleLike(index), child: Column(children: [ Icon(Icons.favorite, color: p.isLiked? Colors.red: Colors.white, size: 32), Text(fmt(p.likes), style: const TextStyle(color: Colors.white, fontSize: 12)) ])),
+          const SizedBox(height: 16),
+          GestureDetector(onTap: ()=> openComments(index), child: Column(children: [ const Icon(Icons.comment, color: neonBlue, size: 28), Text(fmt(p.comments), style: const TextStyle(color: Colors.white, fontSize: 12)) ])),
+          const SizedBox(height: 16),
+          GestureDetector(onTap: ()=> sharePost(index), child: const Column(children: [ Icon(Icons.share, color: neonGreen, size: 26), Text('Share', style: TextStyle(color: Colors.white, fontSize: 12)) ])),
+        ]))
+      ]));
+    }))
+  ]);
 }
 
 class GeekProfilePage extends StatelessWidget {
   const GeekProfilePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const CircleAvatar(
-            radius: 42,
-            backgroundColor: neonGreen,
-            child: Icon(Icons.person, size: 50, color: Colors.black),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Geek Profile',
-            style: TextStyle(fontSize: 24, color: neonGreen),
-          ),
-          const SizedBox(height: 8),
-          Text('User ID: ${user?.uid ?? "Not signed in"}'),
-          const SizedBox(height: 20),
-          const Text('Videos • Followers • Following'),
-        ],
-      ),
-    );
+  @override Widget build(BuildContext context){
+    final user=FirebaseAuth.instance.currentUser;
+    return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [ const CircleAvatar(radius: 42, backgroundColor: neonGreen, child: Icon(Icons.person, size: 50, color: Colors.black)), const SizedBox(height: 16), const Text('Geek Profile', style: TextStyle(fontSize: 24, color: neonGreen)), Text('User ID: ${user?.uid??"Not signed in"}') ]));
   }
 }
 
 class RechargePage extends StatelessWidget {
-  final double balance;
-  final VoidCallback onTestRecharge;
-
-  const RechargePage({
-    super.key,
-    required this.balance,
-    required this.onTestRecharge,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(24),
-      children: [
-        const Icon(Icons.account_balance_wallet,
-            size: 70, color: neonGreen),
-        const SizedBox(height: 20),
-        const Text(
-          'Recharge Wallet',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 26, color: neonGreen),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          'Test balance: ₦${balance.toStringAsFixed(2)}',
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 20),
-        ),
-        const SizedBox(height: 24),
-        const Text(
-          'TEST MODE ONLY\n'
-          'This button simulates a recharge. It does not charge '
-          'your bank account or make a real Paystack payment.',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.orangeAccent),
-        ),
-        const SizedBox(height: 20),
-        ElevatedButton(
-          onPressed: onTestRecharge,
-          child: const Text('Simulate ₦100 Test Recharge'),
-        ),
-        const SizedBox(height: 24),
-        const Text(
-          'Paystack payment setup',
-          style: TextStyle(color: neonBlue, fontSize: 18),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'The Paystack public test key is configured in Part 1. '
-          'Real checkout requires a secure backend to initialize '
-          'and verify payments before adding wallet funds.',
-        ),
-      ],
-    );
-  }
+  final double balance; final VoidCallback onTestRecharge;
+  const RechargePage({super.key, required this.balance, required this.onTestRecharge});
+  @override Widget build(BuildContext context)=> ListView(padding: const EdgeInsets.all(24), children: [ const Icon(Icons.account_balance_wallet, size: 70, color: neonGreen), const Text('Recharge Wallet', textAlign: TextAlign.center, style: TextStyle(fontSize: 26, color: neonGreen)), Text('Test balance: ₦${balance.toStringAsFixed(2)}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 20)), const SizedBox(height: 20), ElevatedButton(onPressed: onTestRecharge, child: const Text('Simulate ₦100 Test Recharge')) ]);
 }
 
-class MoreMoneyPage extends StatefulWidget {
-  const MoreMoneyPage({super.key});
-
-  @override
-  State<MoreMoneyPage> createState() => _MoreMoneyPageState();
-}
-
+class MoreMoneyPage extends StatefulWidget { const MoreMoneyPage({super.key}); @override State<MoreMoneyPage> createState()=> _MoreMoneyPageState(); }
 class _MoreMoneyPageState extends State<MoreMoneyPage> {
-  BannerAd? bannerAd;
-  bool adLoaded = false;
+  BannerAd? bannerAd; bool adLoaded=false;
+  @override void initState(){ super.initState(); bannerAd=BannerAd(adUnitId: admobBannerTestId, size: AdSize.banner, request: const AdRequest(), listener: BannerAdListener(onAdLoaded: (ad){ if(mounted) setState(()=> adLoaded=true); }, onAdFailedToLoad: (ad,err){ ad.dispose(); }))..load(); }
+  @override void dispose(){ bannerAd?.dispose(); super.dispose(); }
+  @override Widget build(BuildContext context)=> ListView(padding: const EdgeInsets.all(24), children: [ const Icon(Icons.monetization_on, size: 70, color: neonGreen), const Text('More Money', textAlign: TextAlign.center, style: TextStyle(fontSize: 28, color: neonGreen)), const SizedBox(height: 20), Center(child: adLoaded&&bannerAd!=null? SizedBox(width: bannerAd!.size.width.toDouble(), height: bannerAd!.size.height.toDouble(), child: AdWidget(ad: bannerAd!)) : const Text('Loading test ad...')) ]);
+}
 
-  @override
-  void initState() {
-    super.initState();
-
-    bannerAd = BannerAd(
-      adUnitId: admobBannerTestId,
-      size: AdSize.banner,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          if (mounted) setState(() => adLoaded = true);
-        },
-        onAdFailedToLoad: (ad, error) {
-          ad.dispose();
-          debugPrint('AdMob error: $error');
-        },
-      ),
-    )..load();
-  }
-
-  @override
-  void dispose() {
-    bannerAd?.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(24),
-      children: [
-        const Icon(Icons.monetization_on,
-            size: 70, color: neonGreen),
-        const SizedBox(height: 16),
-        const Text(
-          'More Money',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 28, color: neonGreen),
-        ),
-        const SizedBox(height: 12),
-        const Text(
-          'AdMob test advertisement',
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 24),
-        Center(
-          child: adLoaded && bannerAd != null
-              ? SizedBox(
-                  width: bannerAd!.size.width.toDouble(),
-                  height: bannerAd!.size.height.toDouble(),
-                  child: AdWidget(ad: bannerAd!),
-                )
-              : const SizedBox(
-                  height: 50,
-                  child: Center(child: Text('Loading test ad...')),
-                ),
-        ),
-        const SizedBox(height: 24),
-        const Text(
-          'Rewards will require a verified reward-ad system '
-          'and secure balance updates before launch.',
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-}class FootballPage extends StatelessWidget {
+class FootballPage extends StatelessWidget {
   const FootballPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(24),
-      children: const [
-        Icon(Icons.sports_soccer, size: 75, color: neonGreen),
-        SizedBox(height: 20),
-        Text(
-          'Geek Football',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 28, color: neonGreen),
-        ),
-        SizedBox(height: 16),
-        Text(
-          'Search football channels and watch football videos.',
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(height: 20),
-        Text(
-          'Football streaming and channel links need to be connected '
-          'to authorized video sources.',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: neonBlue),
-        ),
-      ],
-    );
-  }
+  @override Widget build(BuildContext context) => ListView(padding: const EdgeInsets.all(16), children: [
+    const Icon(Icons.sports_soccer, size: 60, color: neonGreen),
+    const Text('Geek Football & Games', textAlign: TextAlign.center, style: TextStyle(fontSize: 22, color: neonGreen, fontWeight: FontWeight.bold)),
+    const SizedBox(height: 20),
+    Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: const Color(0xFF111820), borderRadius: BorderRadius.circular(16), border: Border.all(color: neonGreen, width: 2)), child: Column(children: [
+      const Icon(Icons.location_city, size: 60, color: neonGreen),
+      const Text('CITY WARS', style: TextStyle(color: neonGreen, fontSize: 20, fontWeight: FontWeight.bold)),
+      const Text('Capture the city - Tap to earn!', style: TextStyle(color: Colors.white70)),
+      const SizedBox(height: 12),
+      ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: neonGreen, minimumSize: const Size(double.infinity, 50)), onPressed: (){ Navigator.push(context, MaterialPageRoute(builder: (_)=> const CityWarsGame())); }, child: const Text('PLAY CITY WARS', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold))),
+    ])),
+  ]);
 }
 
-class GKCallPage extends StatelessWidget {
-  final double balance;
+class GKCallPage extends StatelessWidget { final double balance; const GKCallPage({super.key, required this.balance}); @override Widget build(BuildContext context)=> ListView(padding: const EdgeInsets.all(24), children: [ const Icon(Icons.video_call, size: 75, color: neonGreen), const Text('GK Call', textAlign: TextAlign.center, style: TextStyle(fontSize: 28, color: neonGreen)), Text('Available test balance: ₦${balance.toStringAsFixed(2)}', textAlign: TextAlign.center), const TextField(decoration: InputDecoration(labelText: 'Enter Geek ID or phone', border: OutlineInputBorder(), prefixIcon: Icon(Icons.person_search))) ]); }
 
-  const GKCallPage({
-    super.key,
-    required this.balance,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(24),
-      children: [
-        const Icon(Icons.video_call, size: 75, color: neonGreen),
-        const SizedBox(height: 16),
-        const Text(
-          'GK Call',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 28, color: neonGreen),
-        ),
-        const SizedBox(height: 20),
-        Text(
-          'Available test balance: ₦${balance.toStringAsFixed(2)}',
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 18),
-        ),
-        const SizedBox(height: 24),
-        const TextField(
-          keyboardType: TextInputType.text,
-          decoration: InputDecoration(
-            labelText: 'Enter Geek ID or phone number',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.person_search),
-          ),
-        ),
-        const SizedBox(height: 16),
-        const Text(
-          'Voice and video calling will require a connected calling '
-          'service and a verified wallet-payment system.',
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-}class CityWarsGame extends StatefulWidget {
-  const CityWarsGame({super.key});
-
-  @override
-  State<CityWarsGame> createState() => _CityWarsGameState();
-}
-
+class CityWarsGame extends StatefulWidget { const CityWarsGame({super.key}); @override State<CityWarsGame> createState() => _CityWarsGameState(); }
 class _CityWarsGameState extends State<CityWarsGame> {
-  int score = 0;
-  int energy = 10;
-  bool gameOver = false;
-
-  void tapCity() {
-    if (gameOver) return;
-
-    setState(() {
-      score += 10;
-      energy--;
-
-      if (energy <= 0) {
-        gameOver = true;
-      }
-    });
-  }
-
-  void restartGame() {
-    setState(() {
-      score = 0;
-      energy = 10;
-      gameOver = false;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF050709),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF050709),
-        title: const Text(
-          'CITY WARS',
-          style: TextStyle(
-            color: Color(0xFF39FF55),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            const Text(
-              'CAPTURE THE CITY',
-              style: TextStyle(
-                color: Color(0xFF10C9FF),
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Score: $score',
-              style: const TextStyle(
-                color: Color(0xFF39FF55),
-                fontSize: 28,
-              ),
-            ),
-            Text(
-              'Energy: $energy',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(height: 30),
-            Expanded(
-              child: Center(
-                child: gameOver
-                    ? const Text(
-                        'GAME OVER!',
-                        style: TextStyle(
-                          color: Colors.redAccent,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                    : GestureDetector(
-                        onTap: tapCity,
-                        child: Container(
-                          width: 220,
-                          height: 220,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF101820),
-                            border: Border.all(
-                              color: const Color(0xFF39FF55),
-                              width: 3,
-                            ),
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Color(0x5539FF55),
-                                blurRadius: 20,
-                              ),
-                            ],
-                          ),
-                          child: const Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.location_city,
-                                color: Color(0xFF39FF55),
-                                size: 85,
-                              ),
-                              SizedBox(height: 12),
-                              Text(
-                                'TAP TO CAPTURE',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-              ),
-            ),
-            if (gameOver) ...[
-              Text(
-                'Final score: $score',
-                style: const TextStyle(
-                  color: Color(0xFF10C9FF),
-                  fontSize: 20,
-                ),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: restartGame,
-                child: const Text('PLAY AGAIN'),
-              ),
-            ],
-            const SizedBox(height: 20),
-            const Text(
-              'CITY WARS LEADERBOARD',
-              style: TextStyle(
-                color: Color(0xFF10C9FF),
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const ListTile(
-              leading: Icon(Icons.emoji_events, color: Colors.amber),
-              title: Text(
-                'Leaderboard',
-                style: TextStyle(color: Colors.white),
-              ),
-              subtitle: Text(
-                'Online rankings not connected yet',
-                style: TextStyle(color: Colors.white70),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  int score = 0; int energy = 10; bool gameOver = false;
+  void tapCity(){ if(gameOver) return; setState((){ score+=10; energy--; if(energy<=0) gameOver=true; }); }
+  void restartGame(){ setState((){ score=0; energy=10; gameOver=false; }); }
+  @override Widget build(BuildContext context) => Scaffold(
+    backgroundColor: const Color(0xFF050709),
+    appBar: AppBar(backgroundColor: const Color(0xFF050709), title: const Text('CITY WARS', style: TextStyle(color: Color(0xFF39FF55), fontWeight: FontWeight.bold)), leading: IconButton(icon: const Icon(Icons.arrow_back, color: neonGreen), onPressed: ()=> Navigator.pop(context))),
+    body: Padding(padding: const EdgeInsets.all(20), child: Column(children: [
+      const Text('CAPTURE THE CITY', style: TextStyle(color: Color(0xFF10C9FF), fontSize: 22, fontWeight: FontWeight.bold)),
+      const SizedBox(height: 20),
+      Text('Score: $score', style: const TextStyle(color: Color(0xFF39FF55), fontSize: 28)),
+      Text('Energy: $energy', style: const TextStyle(color: Colors.white, fontSize: 18)),
+      const SizedBox(height: 30),
+      Expanded(child: Center(child: gameOver? const Text('GAME OVER!', style: TextStyle(color: Colors.redAccent, fontSize: 30, fontWeight: FontWeight.bold)) : GestureDetector(onTap: tapCity, child: Container(width: 220, height: 220, decoration: BoxDecoration(color: const Color(0xFF101820), border: Border.all(color: Color(0xFF39FF55), width: 3), borderRadius: BorderRadius.circular(24)), child: const Column(mainAxisAlignment: MainAxisAlignment.center, children: [ Icon(Icons.location_city, color: Color(0xFF39FF55), size: 85), SizedBox(height: 12), Text('TAP TO CAPTURE', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)) ]))))),
+      if(gameOver)...[ Text('Final score: $score', style: const TextStyle(color: Color(0xFF10C9FF), fontSize: 20)), const SizedBox(height: 12), ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: neonGreen), onPressed: restartGame, child: const Text('PLAY AGAIN', style: TextStyle(color: Colors.black))) ],
+      const SizedBox(height: 20),
+      const Text('CITY WARS LEADERBOARD', style: TextStyle(color: Color(0xFF10C9FF), fontSize: 18, fontWeight: FontWeight.bold)),
+      const ListTile(leading: Icon(Icons.emoji_events, color: Colors.amber), title: Text('Leaderboard', style: TextStyle(color: Colors.white)), subtitle: Text('Online rankings not connected yet', style: TextStyle(color: Colors.white70))),
+    ])),
+  );
 }
