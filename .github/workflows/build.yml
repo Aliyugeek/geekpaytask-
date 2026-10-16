@@ -13,11 +13,11 @@ jobs:
         with:
           flutter-version: '3.22.2'
           channel: 'stable'
+      - run: flutter create . --org com.geek --project-name paytask --overwrite
       - run: flutter pub get
       - run: flutter build apk --release
-      - run: mv build/app/outputs/flutter-apk/app-release.apk geekpaytask.apk
+      - run: mv build/app/outputs/flutter-apk/app-release.apk geekpaytask-app.apk
       - uses: actions/upload-artifact@v4
         with:
           name: apk
-          path: geekpaytask.apk
-          
+          path: geekpaytask-app.apk
