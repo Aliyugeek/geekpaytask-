@@ -1,114 +1,319 @@
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GK Net</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Include styles here -->
-</head>
-<body>
-    <header>
-        <h1>GK Net</h1>
-    </header>
-    <nav>
-        <button onclick="showFollow()">Follow</button>
-        <button onclick="showLike()">Like</button>
-        <button onclick="showComment()">Comment</button>
-        <button onclick="showShare()">Share</button>
-        <button onclick="recharge()">Recharge</button>
-        <button onclick="postMedia()">Post</button>
-        <button onclick="callUser()">Call</button>
-        <button onclick="playGame()">City Wars</button>
-        <button onclick="dailyCheck()">Daily Check</button>
-    </nav>
+```javascript
+import React, { useState, useEffect } from 'react';
+import { 
+  StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, 
+  FlatList, TextInput, Alert, Modal, SafeAreaView, StatusBar 
+} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import * as MediaLibrary from 'expo-media-library';
+import { Video } from 'expo-av';
 
-    <main id="mainContent">
-        <!-- Dynamic content will load here -->
-    </main>
+// --- MOCK DATA & CONFIGURATION ---
+const APP_NAME = "GK Geek PayTask";
+const ADMIN_PHONE = "9039638924"; // Your Opay Account Number
 
-    <script>
-        function showFollow() {
-            alert("Follow button clicked.");
-        }
+const MOCK_VIDEOS = [
+  { id: '1', uri: 'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4', user: '@sadiya_queen', likes: 12800 },
+  { id: '2', uri: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', user: '@gk_admin', likes: 5000 },
+];
 
-        function showLike() {
-            alert("Like button clicked.");
-        }
+// --- SCREENS ---
+
+// 1. HOME SCREEN (TikTok Style Feed)
+const HomeScreen = () => {
+  const handleCommentPress = (userId) => {
+    // Logic: When comment is pressed, open screen with search bar and video call icon
+    alert(`Opening Comment Screen for ${userId}. \nFeature: Search ID/Number + Video Call User.`);
+  };
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={MOCK_VIDEOS}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.videoCard}>
+            <Video 
+              source={{ uri: item.uri }} 
+              style={styles.fullScreenVideo} 
+              useNativeControls={false} 
+              resizeMode="cover" 
+              isLooping 
+            />
+            
+            {/* Overlay UI */}
+            <View style={styles.overlay}>
+              <View style={styles.userHeader}>
+                <Image source={{uri: 'https://i.pravatar.cc/100'}} style={styles.avatar} />
+                <Text style={styles.username}>{item.user}</Text>
+              </View>
+              
+              <Text style={styles.caption}>Life is better when you smile #GK</Text>
+
+              <View style={styles.sideActions}>
+                <TouchableOpacity onPress={() => console.log('Follow')}>
+                  <Text style={styles.icon}>👤 Follow</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => console.log('Like')}>
+                  <Text style={styles.icon}>❤️ {item.likes}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleCommentPress(item.user)}>
+                  <Text style={styles.icon}>💬 1.2K</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => console.log('Share')}>
+                  <Text style={styles.icon}>↗ Share</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        )}
+      />
+    </View>
+  );
+};
+
+// 2. RECHARGE SCREEN (Opay Integration)
+const RechargeScreen = () => {
+  const [amount, setAmount] = useState('');
+  
+  const handlePay = () => {
+    if (!amount) return Alert.alert("Error", "Enter amount");
     
-        function showComment() {
-            const commentSection = `
-                <h2>Comment Section</h2>
-                <input type="text" placeholder="Write a comment..." />
-                <button onclick="submitComment()">Submit</button>
-            `;
-            document.getElementById('mainContent').innerHTML = commentSection;
-        }
+    Alert.alert(
+      "Payment Details",
+      `Please pay ₦${amount} to:\n\nOpay Account: ${ADMIN_PHONE}\nName: Hassan Aliyu Geek`,
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "I Have Paid", onPress: () => {
+           // In a real app, send transaction proof to backend here
+           Alert.alert("Success", "Proof sent! Admin will credit your wallet.");
+        }}
+      ]
+    );
+  };
 
-        function submitComment() {
-            alert("Comment submitted!");
-            // Implement further logic for handling comments
-        }
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.centered}>
+        <Text style={styles.title}>Wallet Recharge</Text>
+        <View style={styles.card}>
+          <Text style={styles.label}>Send Money To:</Text>
+          <Text style={styles.accountNumber}>{ADMIN_PHONE}</Text>
+          <Text style={styles.accountName}>Hassan Aliyu Geek</Text>
+        </View>
+        
+        <TextInput 
+          style={styles.input} 
+          placeholder="Enter Amount (₦)" 
+          keyboardType="numeric"
+          value={amount}
+          onChangeText={setAmount}
+        />
+        
+        <TouchableOpacity style={styles.btnPrimary} onPress={handlePay}>
+          <Text style={styles.btnText}>I HAVE PAID</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+};
 
-        function showShare() {
-            alert("Share button clicked.");
-        }
+// 3. POST SCREEN (Gallery & Upload)
+const PostScreen = () => {
+  const [videoUri, setVideoUri] = useState(null);
 
-        function recharge() {
-            const rechargeForm = `
-                <h2>Recharge</h2>
-                <p>OPay Account Number: 9039638924</p>
-                <button onclick="processPayment()">Proceed to Pay</button>
-            `;
-            document.getElementById('mainContent').innerHTML = rechargeForm;
-        }
+  const selectMedia = async () => {
+    // Request permissions
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission needed');
+      return;
+    }
 
-        function processPayment() {
-            alert("Redirecting to payment...");
-            // Implement payment logic
+    // Open picker (Mocking result for simplicity)
+    Alert.alert("Select Media", "Choose image or video from gallery.", [
+      {
+        text: "Select Video",
+        onPress: async () => {
+          // In real app, use expo-image-picker to get URI
+          // For demo, we just show the video player immediately
+          setVideoUri(MOCK_VIDEOS[0].uri); 
         }
+      },
+      { text: "Cancel", style: "cancel" }
+    ]);
+  };
 
-        function postMedia() {
-            const mediaOptions = `
-                <h2>Select Media</h2>
-                <button onclick="selectMedia('image')">Upload Image</button>
-                <button onclick="selectMedia('video')">Upload Video</button>
-            `;
-            document.getElementById('mainContent').innerHTML = mediaOptions;
-        }
+  return (
+    <SafeAreaView style={styles.container}>
+      {!videoUri ? (
+        <View style={styles.centered}>
+          <Text style={styles.title}>Create New Post</Text>
+          <TouchableOpacity style={styles.btnPrimary} onPress={selectMedia}>
+            <Text style={styles.btnText}>Select Video/Image</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        // Logic: Returned to app screen to play video
+        <View style={styles.fullScreenVideo}>
+          <Video source={{ uri: videoUri }} style={styles.fullScreenVideo} isLooping />
+          <TouchableOpacity onPress={() => setVideoUri(null)} style={styles.backBtn}>
+            <Text style={{color:'white'}}>Back to Edit</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    </SafeAreaView>
+  );
+};
 
-        function selectMedia(type) {
-            alert("Selected " + type + " upload.");
-            // Implement image/video upload logic
-        }
+// 4. CALL SCREEN (Search History)
+const CallScreen = () => {
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.searchBar}>
+        <TextInput placeholder="Search User ID / Number..." style={styles.input} />
+      </View>
+      
+      <View style={styles.listItem}>
+        <Text style={styles.sectionTitle}>Call History</Text>
+        <Text>@john_doe - 5 mins ago</Text>
+        <Text>@jane_smith - 2 hours ago</Text>
+      </View>
+    </SafeAreaView>
+  );
+};
 
-        function callUser() {
-            const callSection = `
-                <h2>Call User</h2>
-                <input type="text" placeholder="Enter user ID or number" />
-                <button onclick="makeCall()">Call</button>
-            `;
-            document.getElementById('mainContent').innerHTML = callSection;
-        }
+// 5. CITYWARS GAME (With Banner Ad)
+const CityWarsScreen = () => {
+  return (
+    <View style={styles.gameContainer}>
+      {/* Game Area */}
+      <View style={styles.gameArea}>
+        <Text style={styles.gameTitle}>CITY WARS</Text>
+        <Text style={styles.gameSubtext}>Running Game Simulation...</Text>
+        <TouchableOpacity style={styles.playBtn}><Text>PLAY NOW</Text></TouchableOpacity>
+      </View>
 
-        function makeCall() {
-            alert("Calling user...");
-            // Implement call functionality
-        }
+      {/* Banner Ad (Small Screen within user play) */}
+      <View style={styles.bannerAd}>
+        <Text style={styles.adText}>ADVERTISEMENT SPACE</Text>
+      </View>
+    </View>
+  );
+};
 
-        function playGame() {
-            alert("Launching City Wars game...");
-            // Implement game logic
-        }
+// 6. DAILY CHECK (Ads Task)
+const DailyCheckScreen = () => {
+  const [completed, setCompleted] = useState(new Array(12).fill(false));
+  const totalAds = 24; // 12 checks x 2 ads each
 
-        function dailyCheck() {
-            const dailyCheckSection = `
-                <h2>Daily Check</h2>
-                <p>Complete 24 ads today to earn rewards!</p>
-            `;
-            document.getElementById('mainContent').innerHTML = dailyCheckSection;
-        }
-    </script>
-</body>
-</html>
+  const handleCheckIn = (index) => {
+    // Logic: Trigger 2 Ads
+    Alert.alert("Watching Ads", "Showing 2 Ads now...");
+    setTimeout(() => {
+      const newStatus = [...completed];
+      newStatus[index] = true;
+      setCompleted(newStatus);
+    }, 1000);
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Daily Security Check</Text>
+      <ScrollView contentContainerStyle={styles.grid}>
+        {completed.map((isDone, index) => (
+          <TouchableOpacity 
+            key={index} 
+            style={[styles.checkBox, isDone && styles.checked]}
+            onPress={() => !isDone && handleCheckIn(index)}
+          >
+            <Text style={styles.checkText}>{index + 1}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+      <Text style={styles.subtext}>Complete all 12 security points (24 Ads) to earn reward.</Text>
+    </SafeAreaView>
+  );
+};
+
+// --- MAIN NAVIGATION ---
+const Tab = createBottomTabNavigator();
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <StatusBar barStyle="light-content" backgroundColor="#000" />
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+            if (route.name === 'Home') iconName = focused ? '🏠' : '🏠';
+            else if (route.name === 'Recharge') iconName = focused ? '⚡' : '⚡';
+            else if (route.name === 'Post') iconName = '+';
+            else if (route.name === 'Call') iconName = focused ? '📞' : '📞';
+            else if (route.name === 'CityWars') iconName = '⚔️';
+            else if (route.name === 'DailyCheck') iconName = '✅';
+            return <Text style={{ fontSize: size }}>{iconName}</Text>;
+          },
+          tabBarActiveTintColor: '#00ff00', // Green like TikTok/GK
+          tabBarInactiveTintColor: 'gray',
+          tabBarStyle: { backgroundColor: '#000' },
+          headerStyle: { backgroundColor: '#000' },
+          headerTintColor: '#fff',
+        })}
+      >
+        <Tab.Screen name="Home" component={HomeScreen} options={{headerShown: false}} />
+        <Tab.Screen name="Recharge" component={RechargeScreen} />
+        <Tab.Screen name="Post" component={PostScreen} />
+        <Tab.Screen name="Call" component={CallScreen} />
+        <Tab.Screen name="CityWars" component={CityWarsScreen} />
+        <Tab.Screen name="DailyCheck" component={DailyCheckScreen} />
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
+}
+
+// --- STYLES ---
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#000' },
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+  title: { fontSize: 24, fontWeight: 'bold', color: '#fff', marginBottom: 20 },
+  card: { backgroundColor: '#222', padding: 20, borderRadius: 10, alignItems: 'center', width: '100%', marginBottom: 20 },
+  accountNumber: { fontSize: 22, fontWeight: 'bold', color: '#00ff00', marginVertical: 5 },
+  input: { borderWidth: 1, borderColor: '#444', padding: 10, borderRadius: 5, width: '100%', color: '#fff', marginBottom: 15 },
+  btnPrimary: { backgroundColor: '#00ff00', padding: 15, borderRadius: 5, width: '100%', alignItems: 'center' },
+  btnText: { color: '#000', fontWeight: 'bold', fontSize: 16 },
+  
+  // Home Styles
+  videoCard: { height: '100%', width: '100%' },
+  fullScreenVideo: { width: '100%', height: '100%' },
+  overlay: { position: 'absolute', bottom: 70, left: 10, right: 60, justifyContent: 'flex-end' },
+  userHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+  avatar: { width: 40, height: 40, borderRadius: 20, marginRight: 10 },
+  username: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  caption: { color: '#fff', fontSize: 14, marginBottom: 10 },
+  sideActions: { position: 'absolute', right: 10, bottom: 100, alignItems: 'center' },
+  icon: { color: '#fff', fontSize: 24, marginVertical: 10 },
+
+  // Call Styles
+  searchBar: { padding: 15, borderBottomWidth: 1, borderBottomColor: '#333' },
+  listItem: { padding: 20 },
+  sectionTitle: { color: '#fff', fontWeight: 'bold', marginBottom: 10 },
+
+  // Game Styles
+  gameContainer: { flex: 1, backgroundColor: '#111' },
+  gameArea: { flex: 3, justifyContent: 'center', alignItems: 'center' },
+  gameTitle: { fontSize: 30, color: '#ff4444', fontWeight: 'bold' },
+  playBtn: { marginTop: 20, padding: 10, backgroundColor: '#fff', borderRadius: 5 },
+  bannerAd: { height: 60, backgroundColor: '#333', justifyContent: 'center', alignItems: 'center', borderTopWidth: 1, borderColor: '#555' },
+  adText: { color: '#aaa' },
+
+  // Daily Check Styles
+  grid: { padding: 10, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+  checkBox: { width: 60, height: 60, borderWidth: 1, borderColor: '#fff', justifyContent: 'center', alignItems: 'center', borderRadius: 10, margin: 5 },
+  checked: { backgroundColor: '#00ff00' },
+  checkText: { color: '#fff', fontWeight: 'bold' },
+  subtext: { color: '#888', textAlign: 'center', margin: 20 }
+});
 ```
