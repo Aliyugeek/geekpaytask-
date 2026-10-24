@@ -1,466 +1,69 @@
-```html
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geek PayTask App</title>
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-green: #00e676; /* Neon Green from screenshots */
-            --dark-bg: #121212;
-            --card-bg: #1e1e1e;
-            --text-white: #ffffff;
-            --text-gray: #b0b0b0;
-            --opay-green: #009688;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: #000;
-            color: var(--text-white);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        /* Mobile Container Simulation */
-        .app-container {
-            width: 100%;
-            max-width: 400px;
-            height: 800px;
-            background-color: var(--dark-bg);
-            position: relative;
-            overflow: hidden;
-            border-radius: 20px;
-            box-shadow: 0 0 20px rgba(0, 230, 118, 0.2);
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* --- SCREENS --- */
-        .screen {
-            display: none;
-            height: 100%;
-            width: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: var(--dark-bg);
-            z-index: 10;
-            overflow-y: auto;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        /* --- LOGIN SCREEN --- */
-        #login-screen {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80');
-            background-size: cover;
-        }
-
-        .logo-area {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .logo-icon {
-            font-size: 60px;
-            color: var(--primary-green);
-            margin-bottom: 10px;
-        }
-
-        .input-group {
-            width: 100%;
-            margin-bottom: 15px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 15px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid #333;
-            border-radius: 8px;
-            color: white;
-            outline: none;
-        }
-
-        .btn-main {
-            width: 100%;
-            padding: 15px;
-            background: var(--primary-green);
-            border: none;
-            border-radius: 25px;
-            color: black;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        /* --- MAIN APP HEADER --- */
-        .app-header {
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
-            position: sticky;
-            top: 0;
-            z-index: 20;
-        }
-
-        .balance-card {
-            background: linear-gradient(90deg, #004d40, #00695c);
-            padding: 15px;
-            border-radius: 12px;
-            margin: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .add-money-btn {
-            background: white;
-            color: #004d40;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* --- FEED SCREEN --- */
-        .feed-video-container {
-            height: 100%;
-            width: 100%;
-            background: #000;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .feed-video-placeholder {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.6;
-        }
-
-        .feed-overlay {
-            position: absolute;
-            bottom: 70px;
-            left: 15px;
-            right: 60px;
-        }
-
-        .user-info h3 {
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-
-        .caption {
-            font-size: 14px;
-            color: #ddd;
-            margin-bottom: 10px;
-        }
-
-        .side-actions {
-            position: absolute;
-            right: 10px;
-            bottom: 100px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .action-item {
-            text-align: center;
-            color: white;
-            cursor: pointer;
-        }
-
-        .action-item i {
-            font-size: 28px;
-            margin-bottom: 5px;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-        }
-
-        .action-item span {
-            display: block;
-            font-size: 12px;
-        }
-
-        /* --- BOTTOM NAV --- */
-        .bottom-nav {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 60px;
-            background: #000;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border-top: 1px solid #333;
-            z-index: 30;
-        }
-
-        .nav-item {
-            color: var(--text-gray);
-            text-align: center;
-            font-size: 10px;
-            cursor: pointer;
-        }
-
-        .nav-item.active {
-            color: var(--primary-green);
-        }
-
-        .nav-item i {
-            font-size: 20px;
-            margin-bottom: 3px;
-            display: block;
-        }
-
-        .post-btn {
-            width: 45px;
-            height: 30px;
-            background: linear-gradient(90deg, #00e676, #00b0ff);
-            border-radius: 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: black;
-            font-size: 18px;
-        }
-
-        /* --- RECHARGE MODAL --- */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: #1e1e1e;
-            padding: 25px;
-            border-radius: 20px;
-            width: 85%;
-            text-align: center;
-            border: 1px solid #333;
-        }
-
-        .account-number {
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
-            margin: 10px 0;
-            letter-spacing: 1px;
-        }
-
-        .account-name {
-            color: var(--primary-green);
-            margin-bottom: 20px;
-        }
-
-        /* --- GK CALL SCREEN --- */
-        .call-header {
-            padding: 15px;
-            background: #1e1e1e;
-            border-bottom: 1px solid #333;
-        }
-
-        .search-bar {
-            background: #333;
-            padding: 10px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #aaa;
-        }
-
-        .call-list {
-            padding: 10px;
-        }
-
-        .call-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid #333;
-        }
-
-        .call-info h4 { font-size: 16px; }
-        .call-info p { font-size: 12px; color: #888; }
-        
-        .call-cost {
-            background: #333;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            color: var(--primary-green);
-        }
-
-        .agora-badge {
-            background: #2c2c2c;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 10px;
-            color: #fff;
-            margin-left: 5px;
-        }
-
-        /* --- DAILY TASKS --- */
-        .task-card {
-            background: #1e1e1e;
-            margin: 15px;
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid #333;
-        }
-
-        .task-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .task-reward {
-            color: var(--primary-green);
-            font-weight: bold;
-        }
-
-        .btn-complete {
-            background: var(--primary-green);
-            color: black;
-            border: none;
-            padding: 5px 15px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        /* --- ADMIN DASHBOARD --- */
-        .admin-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            padding: 15px;
-        }
-
-        .stat-card {
-            background: #1e1e1e;
-            padding: 15px;
-            border-radius: 10px;
-        }
-
-        .stat-card h3 { font-size: 20px; color: var(--primary-green); }
-        .stat-card p { font-size: 12px; color: #aaa; }
-
-        .admin-nav {
-            display: flex;
-            justify-content: space-around;
-            background: #000;
-            padding: 10px 0;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .admin-nav-item {
-            color: #aaa;
-            font-size: 10px;
-            text-align: center;
-        }
-        
-        .admin-nav-item.active { color: var(--primary-green); }
-        .admin-nav-item i { font-size: 18px; display: block; margin-bottom: 2px; }
-
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GEEK PAYTASK</title>
+<meta name="google-adsense-account" content="ca-pub-7768520042626041">
+<meta name="admob-app-id" content="ca-app-pub-7768520042626041~4128663213">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7768520042626041" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+:root{--primary-green:#00ff88}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#fff;font-family:Arial}
+.app-container{max-width:400px;margin:0 auto;background:#000;min-height:100vh}
+.screen{display:none;min-height:100vh;padding-bottom:80px}
+.screen.active{display:block}
+.logo-area{text-align:center;padding:60px 20px 30px}
+.logo-icon{font-size:60px;color:var(--primary-green)}
+.input-group{margin:15px}
+.input-group input{width:100%;padding:15px;border-radius:10px;border:1px solid #333;background:#1e1e1e;color:#fff}
+.btn-main{background:var(--primary-green);color:#000;border:none;width:90%;margin:15px;padding:15px;border-radius:10px;font-weight:bold;font-size:16px}
+.app-header{display:flex;justify-content:space-between;padding:15px;background:#1e1e1e}
+.admob-banner{width:100%;background:#111;text-align:center;min-height:60px;border:1px solid #222}
+.account-number{font-size:24px;font-weight:bold;color:#fff;margin:10px 0}
+.account-name{color:var(--primary-green);margin-bottom:20px}
+.feed-video-container{position:relative;height:70vh}
+.feed-video-placeholder{width:100%;height:100%;object-fit:cover}
+</style>
+<script>
+const firebaseConfig = {
+  apiKey: "REPLACE_WITH_YOUR_API_KEY",
+  authDomain: "geek-paytask.firebaseapp.com",
+  projectId: "geek-paytask",
+  storageBucket: "geek-paytask.appspot.com",
+  messagingSenderId: "REPLACE",
+  appId: "REPLACE"
+};
+try{firebase.initializeApp(firebaseConfig);}catch(e){}
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  try{(adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){}
+}
+window.onload=()=>{try{(adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){}}
+</script>
 </head>
 <body>
-
 <div class="app-container">
-
-    <!-- 1. LOGIN SCREEN -->
-    <div id="login-screen" class="screen active">
-        <div class="logo-area">
-            <i class="fas fa-crown logo-icon"></i>
-            <h1>GEEK PAYTASK</h1>
-            <p style="color:#aaa;">Admin Dashboard & User App</p>
-        </div>
-        <div class="input-group">
-            <input type="email" placeholder="Enter Email" value="aliyugeek5@gmail.com">
-        </div>
-        <div class="input-group">
-            <input type="password" placeholder="Enter Password" value="password">
-        </div>
-        <button class="btn-main" onclick="showScreen('home-screen')">Login →</button>
-        <p style="margin-top:20px; font-size:12px; color:#aaa;">Secure Access Only authorized administrators</p>
-    </div>
-
-    <!-- 2. HOME / FEED SCREEN -->
-    <div id="home-screen" class="screen">
-        <div class="app-header">
-            <i class="fas fa-plus-circle" style="font-size:24px; color:white;"></i>
-            <div style="display:flex; gap:15px;">
-                <span style="opacity:0.7;">Following</span>
-                <span style="border-bottom:2px solid var(--primary-green);">For You</span>
-            </div>
-            <i class="fas fa-search" style="font-size:20px;"></i>
-        </div>
-
-        <div class="feed-video-container">
-            <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="feed-video-placeholder" alt="Video Content">
-            
-            <div class="feed-overlay">
-                <div class="user-info">
-                    <h3>@Sarah_Vibes <i class="fas fa-check-circle" style="color:var(--primary-green);"></i></h3>
-                    <p class="caption">Late night dance moves with a neon backdrop! 🔥💃 #dance #citylife #neon #foryou</p>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <i class="fas fa-music"></i>
-                        <marquee style="width:150px; font-size:12px;">Neon Grooves - Midnight Beats</marquee>
-                    </div>
-                </div>
-            </div>
-
-            <div class="side-actions">
-                <div class="action-item" onclick="alert('Profile opened')">
-                    <img src="https://randomuser.me/api/portraits/women/44.jpg" style="width:45px; height:45px; border-radius:50%; border:2px solid white;">
-                    <i class="fas fa-plus" style="position:absolute; bottom:-10px; left:15px; color:white; background:red; border-radius:50%; padding:2px;"></i>
-                </div>
-                <div class="action-item" onclick="alert('Liked!')">
-                    <i class="fas fa-heart" style="color:#fe2c55;"></i>
-                    <span>1.4M</span>
-                </div>
-                <div class="
+<div class="admob-banner">
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7768520042626041" data-ad-slot="2368792747" data-ad-format="auto" data-full-width-responsive="true"></ins>
+</div>
+<div id="login-screen" class="screen active">
+<div class="logo-area"><i class="fas fa-crown logo-icon"></i><h1>GEEK PAYTASK</h1></div>
+<div class="input-group"><input type="email" value="aliyugeek5@gmail.com"></div>
+<div class="input-group"><input type="password" value="password"></div>
+<button class="btn-main" onclick="showScreen('home-screen')">Login →</button>
+</div>
+<div id="home-screen" class="screen">
+<div class="app-header"><i class="fas fa-plus-circle"></i><span>For You</span><i class="fas fa-search"></i></div>
+<div class="feed-video-container">
+<img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800" class="feed-video-placeholder">
+</div>
+</div>
+</div>
+</body>
+</html>
