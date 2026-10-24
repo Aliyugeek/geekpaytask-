@@ -1,319 +1,466 @@
-```javascript
-import React, { useState, useEffect } from 'react';
-import { 
-  StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, 
-  FlatList, TextInput, Alert, Modal, SafeAreaView, StatusBar 
-} from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import * as MediaLibrary from 'expo-media-library';
-import { Video } from 'expo-av';
-
-// --- MOCK DATA & CONFIGURATION ---
-const APP_NAME = "GK Geek PayTask";
-const ADMIN_PHONE = "9039638924"; // Your Opay Account Number
-
-const MOCK_VIDEOS = [
-  { id: '1', uri: 'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4', user: '@sadiya_queen', likes: 12800 },
-  { id: '2', uri: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', user: '@gk_admin', likes: 5000 },
-];
-
-// --- SCREENS ---
-
-// 1. HOME SCREEN (TikTok Style Feed)
-const HomeScreen = () => {
-  const handleCommentPress = (userId) => {
-    // Logic: When comment is pressed, open screen with search bar and video call icon
-    alert(`Opening Comment Screen for ${userId}. \nFeature: Search ID/Number + Video Call User.`);
-  };
-
-  return (
-    <View style={styles.container}>
-      <FlatList
-        data={MOCK_VIDEOS}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.videoCard}>
-            <Video 
-              source={{ uri: item.uri }} 
-              style={styles.fullScreenVideo} 
-              useNativeControls={false} 
-              resizeMode="cover" 
-              isLooping 
-            />
-            
-            {/* Overlay UI */}
-            <View style={styles.overlay}>
-              <View style={styles.userHeader}>
-                <Image source={{uri: 'https://i.pravatar.cc/100'}} style={styles.avatar} />
-                <Text style={styles.username}>{item.user}</Text>
-              </View>
-              
-              <Text style={styles.caption}>Life is better when you smile #GK</Text>
-
-              <View style={styles.sideActions}>
-                <TouchableOpacity onPress={() => console.log('Follow')}>
-                  <Text style={styles.icon}>👤 Follow</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => console.log('Like')}>
-                  <Text style={styles.icon}>❤️ {item.likes}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleCommentPress(item.user)}>
-                  <Text style={styles.icon}>💬 1.2K</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => console.log('Share')}>
-                  <Text style={styles.icon}>↗ Share</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        )}
-      />
-    </View>
-  );
-};
-
-// 2. RECHARGE SCREEN (Opay Integration)
-const RechargeScreen = () => {
-  const [amount, setAmount] = useState('');
-  
-  const handlePay = () => {
-    if (!amount) return Alert.alert("Error", "Enter amount");
-    
-    Alert.alert(
-      "Payment Details",
-      `Please pay ₦${amount} to:\n\nOpay Account: ${ADMIN_PHONE}\nName: Hassan Aliyu Geek`,
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "I Have Paid", onPress: () => {
-           // In a real app, send transaction proof to backend here
-           Alert.alert("Success", "Proof sent! Admin will credit your wallet.");
-        }}
-      ]
-    );
-  };
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.centered}>
-        <Text style={styles.title}>Wallet Recharge</Text>
-        <View style={styles.card}>
-          <Text style={styles.label}>Send Money To:</Text>
-          <Text style={styles.accountNumber}>{ADMIN_PHONE}</Text>
-          <Text style={styles.accountName}>Hassan Aliyu Geek</Text>
-        </View>
-        
-        <TextInput 
-          style={styles.input} 
-          placeholder="Enter Amount (₦)" 
-          keyboardType="numeric"
-          value={amount}
-          onChangeText={setAmount}
-        />
-        
-        <TouchableOpacity style={styles.btnPrimary} onPress={handlePay}>
-          <Text style={styles.btnText}>I HAVE PAID</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
-  );
-};
-
-// 3. POST SCREEN (Gallery & Upload)
-const PostScreen = () => {
-  const [videoUri, setVideoUri] = useState(null);
-
-  const selectMedia = async () => {
-    // Request permissions
-    const { status } = await MediaLibrary.requestPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission needed');
-      return;
-    }
-
-    // Open picker (Mocking result for simplicity)
-    Alert.alert("Select Media", "Choose image or video from gallery.", [
-      {
-        text: "Select Video",
-        onPress: async () => {
-          // In real app, use expo-image-picker to get URI
-          // For demo, we just show the video player immediately
-          setVideoUri(MOCK_VIDEOS[0].uri); 
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geek PayTask App</title>
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-green: #00e676; /* Neon Green from screenshots */
+            --dark-bg: #121212;
+            --card-bg: #1e1e1e;
+            --text-white: #ffffff;
+            --text-gray: #b0b0b0;
+            --opay-green: #009688;
         }
-      },
-      { text: "Cancel", style: "cancel" }
-    ]);
-  };
 
-  return (
-    <SafeAreaView style={styles.container}>
-      {!videoUri ? (
-        <View style={styles.centered}>
-          <Text style={styles.title}>Create New Post</Text>
-          <TouchableOpacity style={styles.btnPrimary} onPress={selectMedia}>
-            <Text style={styles.btnText}>Select Video/Image</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        // Logic: Returned to app screen to play video
-        <View style={styles.fullScreenVideo}>
-          <Video source={{ uri: videoUri }} style={styles.fullScreenVideo} isLooping />
-          <TouchableOpacity onPress={() => setVideoUri(null)} style={styles.backBtn}>
-            <Text style={{color:'white'}}>Back to Edit</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-    </SafeAreaView>
-  );
-};
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-// 4. CALL SCREEN (Search History)
-const CallScreen = () => {
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.searchBar}>
-        <TextInput placeholder="Search User ID / Number..." style={styles.input} />
-      </View>
-      
-      <View style={styles.listItem}>
-        <Text style={styles.sectionTitle}>Call History</Text>
-        <Text>@john_doe - 5 mins ago</Text>
-        <Text>@jane_smith - 2 hours ago</Text>
-      </View>
-    </SafeAreaView>
-  );
-};
+        body {
+            background-color: #000;
+            color: var(--text-white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-// 5. CITYWARS GAME (With Banner Ad)
-const CityWarsScreen = () => {
-  return (
-    <View style={styles.gameContainer}>
-      {/* Game Area */}
-      <View style={styles.gameArea}>
-        <Text style={styles.gameTitle}>CITY WARS</Text>
-        <Text style={styles.gameSubtext}>Running Game Simulation...</Text>
-        <TouchableOpacity style={styles.playBtn}><Text>PLAY NOW</Text></TouchableOpacity>
-      </View>
+        /* Mobile Container Simulation */
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            height: 800px;
+            background-color: var(--dark-bg);
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 230, 118, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
 
-      {/* Banner Ad (Small Screen within user play) */}
-      <View style={styles.bannerAd}>
-        <Text style={styles.adText}>ADVERTISEMENT SPACE</Text>
-      </View>
-    </View>
-  );
-};
+        /* --- SCREENS --- */
+        .screen {
+            display: none;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: var(--dark-bg);
+            z-index: 10;
+            overflow-y: auto;
+        }
 
-// 6. DAILY CHECK (Ads Task)
-const DailyCheckScreen = () => {
-  const [completed, setCompleted] = useState(new Array(12).fill(false));
-  const totalAds = 24; // 12 checks x 2 ads each
+        .screen.active {
+            display: block;
+        }
 
-  const handleCheckIn = (index) => {
-    // Logic: Trigger 2 Ads
-    Alert.alert("Watching Ads", "Showing 2 Ads now...");
-    setTimeout(() => {
-      const newStatus = [...completed];
-      newStatus[index] = true;
-      setCompleted(newStatus);
-    }, 1000);
-  };
+        /* --- LOGIN SCREEN --- */
+        #login-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80');
+            background-size: cover;
+        }
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Daily Security Check</Text>
-      <ScrollView contentContainerStyle={styles.grid}>
-        {completed.map((isDone, index) => (
-          <TouchableOpacity 
-            key={index} 
-            style={[styles.checkBox, isDone && styles.checked]}
-            onPress={() => !isDone && handleCheckIn(index)}
-          >
-            <Text style={styles.checkText}>{index + 1}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-      <Text style={styles.subtext}>Complete all 12 security points (24 Ads) to earn reward.</Text>
-    </SafeAreaView>
-  );
-};
+        .logo-area {
+            text-align: center;
+            margin-bottom: 40px;
+        }
 
-// --- MAIN NAVIGATION ---
-const Tab = createBottomTabNavigator();
+        .logo-icon {
+            font-size: 60px;
+            color: var(--primary-green);
+            margin-bottom: 10px;
+        }
 
-export default function App() {
-  return (
-    <NavigationContainer>
-      <StatusBar barStyle="light-content" backgroundColor="#000" />
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
-            if (route.name === 'Home') iconName = focused ? '🏠' : '🏠';
-            else if (route.name === 'Recharge') iconName = focused ? '⚡' : '⚡';
-            else if (route.name === 'Post') iconName = '+';
-            else if (route.name === 'Call') iconName = focused ? '📞' : '📞';
-            else if (route.name === 'CityWars') iconName = '⚔️';
-            else if (route.name === 'DailyCheck') iconName = '✅';
-            return <Text style={{ fontSize: size }}>{iconName}</Text>;
-          },
-          tabBarActiveTintColor: '#00ff00', // Green like TikTok/GK
-          tabBarInactiveTintColor: 'gray',
-          tabBarStyle: { backgroundColor: '#000' },
-          headerStyle: { backgroundColor: '#000' },
-          headerTintColor: '#fff',
-        })}
-      >
-        <Tab.Screen name="Home" component={HomeScreen} options={{headerShown: false}} />
-        <Tab.Screen name="Recharge" component={RechargeScreen} />
-        <Tab.Screen name="Post" component={PostScreen} />
-        <Tab.Screen name="Call" component={CallScreen} />
-        <Tab.Screen name="CityWars" component={CityWarsScreen} />
-        <Tab.Screen name="DailyCheck" component={DailyCheckScreen} />
-      </Tab.Navigator>
-    </NavigationContainer>
-  );
-}
+        .input-group {
+            width: 100%;
+            margin-bottom: 15px;
+        }
 
-// --- STYLES ---
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' },
-  centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
-  title: { fontSize: 24, fontWeight: 'bold', color: '#fff', marginBottom: 20 },
-  card: { backgroundColor: '#222', padding: 20, borderRadius: 10, alignItems: 'center', width: '100%', marginBottom: 20 },
-  accountNumber: { fontSize: 22, fontWeight: 'bold', color: '#00ff00', marginVertical: 5 },
-  input: { borderWidth: 1, borderColor: '#444', padding: 10, borderRadius: 5, width: '100%', color: '#fff', marginBottom: 15 },
-  btnPrimary: { backgroundColor: '#00ff00', padding: 15, borderRadius: 5, width: '100%', alignItems: 'center' },
-  btnText: { color: '#000', fontWeight: 'bold', fontSize: 16 },
-  
-  // Home Styles
-  videoCard: { height: '100%', width: '100%' },
-  fullScreenVideo: { width: '100%', height: '100%' },
-  overlay: { position: 'absolute', bottom: 70, left: 10, right: 60, justifyContent: 'flex-end' },
-  userHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-  avatar: { width: 40, height: 40, borderRadius: 20, marginRight: 10 },
-  username: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-  caption: { color: '#fff', fontSize: 14, marginBottom: 10 },
-  sideActions: { position: 'absolute', right: 10, bottom: 100, alignItems: 'center' },
-  icon: { color: '#fff', fontSize: 24, marginVertical: 10 },
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: white;
+            outline: none;
+        }
 
-  // Call Styles
-  searchBar: { padding: 15, borderBottomWidth: 1, borderBottomColor: '#333' },
-  listItem: { padding: 20 },
-  sectionTitle: { color: '#fff', fontWeight: 'bold', marginBottom: 10 },
+        .btn-main {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-green);
+            border: none;
+            border-radius: 25px;
+            color: black;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
 
-  // Game Styles
-  gameContainer: { flex: 1, backgroundColor: '#111' },
-  gameArea: { flex: 3, justifyContent: 'center', alignItems: 'center' },
-  gameTitle: { fontSize: 30, color: '#ff4444', fontWeight: 'bold' },
-  playBtn: { marginTop: 20, padding: 10, backgroundColor: '#fff', borderRadius: 5 },
-  bannerAd: { height: 60, backgroundColor: '#333', justifyContent: 'center', alignItems: 'center', borderTopWidth: 1, borderColor: '#555' },
-  adText: { color: '#aaa' },
+        /* --- MAIN APP HEADER --- */
+        .app-header {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
 
-  // Daily Check Styles
-  grid: { padding: 10, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-  checkBox: { width: 60, height: 60, borderWidth: 1, borderColor: '#fff', justifyContent: 'center', alignItems: 'center', borderRadius: 10, margin: 5 },
-  checked: { backgroundColor: '#00ff00' },
-  checkText: { color: '#fff', fontWeight: 'bold' },
-  subtext: { color: '#888', textAlign: 'center', margin: 20 }
-});
-```
+        .balance-card {
+            background: linear-gradient(90deg, #004d40, #00695c);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-money-btn {
+            background: white;
+            color: #004d40;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* --- FEED SCREEN --- */
+        .feed-video-container {
+            height: 100%;
+            width: 100%;
+            background: #000;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .feed-video-placeholder {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.6;
+        }
+
+        .feed-overlay {
+            position: absolute;
+            bottom: 70px;
+            left: 15px;
+            right: 60px;
+        }
+
+        .user-info h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .caption {
+            font-size: 14px;
+            color: #ddd;
+            margin-bottom: 10px;
+        }
+
+        .side-actions {
+            position: absolute;
+            right: 10px;
+            bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .action-item {
+            text-align: center;
+            color: white;
+            cursor: pointer;
+        }
+
+        .action-item i {
+            font-size: 28px;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .action-item span {
+            display: block;
+            font-size: 12px;
+        }
+
+        /* --- BOTTOM NAV --- */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            background: #000;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #333;
+            z-index: 30;
+        }
+
+        .nav-item {
+            color: var(--text-gray);
+            text-align: center;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--primary-green);
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 3px;
+            display: block;
+        }
+
+        .post-btn {
+            width: 45px;
+            height: 30px;
+            background: linear-gradient(90deg, #00e676, #00b0ff);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: black;
+            font-size: 18px;
+        }
+
+        /* --- RECHARGE MODAL --- */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #1e1e1e;
+            padding: 25px;
+            border-radius: 20px;
+            width: 85%;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .account-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            margin: 10px 0;
+            letter-spacing: 1px;
+        }
+
+        .account-name {
+            color: var(--primary-green);
+            margin-bottom: 20px;
+        }
+
+        /* --- GK CALL SCREEN --- */
+        .call-header {
+            padding: 15px;
+            background: #1e1e1e;
+            border-bottom: 1px solid #333;
+        }
+
+        .search-bar {
+            background: #333;
+            padding: 10px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #aaa;
+        }
+
+        .call-list {
+            padding: 10px;
+        }
+
+        .call-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #333;
+        }
+
+        .call-info h4 { font-size: 16px; }
+        .call-info p { font-size: 12px; color: #888; }
+        
+        .call-cost {
+            background: #333;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            color: var(--primary-green);
+        }
+
+        .agora-badge {
+            background: #2c2c2c;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 10px;
+            color: #fff;
+            margin-left: 5px;
+        }
+
+        /* --- DAILY TASKS --- */
+        .task-card {
+            background: #1e1e1e;
+            margin: 15px;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+
+        .task-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .task-reward {
+            color: var(--primary-green);
+            font-weight: bold;
+        }
+
+        .btn-complete {
+            background: var(--primary-green);
+            color: black;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* --- ADMIN DASHBOARD --- */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 15px;
+        }
+
+        .stat-card {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .stat-card h3 { font-size: 20px; color: var(--primary-green); }
+        .stat-card p { font-size: 12px; color: #aaa; }
+
+        .admin-nav {
+            display: flex;
+            justify-content: space-around;
+            background: #000;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .admin-nav-item {
+            color: #aaa;
+            font-size: 10px;
+            text-align: center;
+        }
+        
+        .admin-nav-item.active { color: var(--primary-green); }
+        .admin-nav-item i { font-size: 18px; display: block; margin-bottom: 2px; }
+
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- 1. LOGIN SCREEN -->
+    <div id="login-screen" class="screen active">
+        <div class="logo-area">
+            <i class="fas fa-crown logo-icon"></i>
+            <h1>GEEK PAYTASK</h1>
+            <p style="color:#aaa;">Admin Dashboard & User App</p>
+        </div>
+        <div class="input-group">
+            <input type="email" placeholder="Enter Email" value="aliyugeek5@gmail.com">
+        </div>
+        <div class="input-group">
+            <input type="password" placeholder="Enter Password" value="password">
+        </div>
+        <button class="btn-main" onclick="showScreen('home-screen')">Login →</button>
+        <p style="margin-top:20px; font-size:12px; color:#aaa;">Secure Access Only authorized administrators</p>
+    </div>
+
+    <!-- 2. HOME / FEED SCREEN -->
+    <div id="home-screen" class="screen">
+        <div class="app-header">
+            <i class="fas fa-plus-circle" style="font-size:24px; color:white;"></i>
+            <div style="display:flex; gap:15px;">
+                <span style="opacity:0.7;">Following</span>
+                <span style="border-bottom:2px solid var(--primary-green);">For You</span>
+            </div>
+            <i class="fas fa-search" style="font-size:20px;"></i>
+        </div>
+
+        <div class="feed-video-container">
+            <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="feed-video-placeholder" alt="Video Content">
+            
+            <div class="feed-overlay">
+                <div class="user-info">
+                    <h3>@Sarah_Vibes <i class="fas fa-check-circle" style="color:var(--primary-green);"></i></h3>
+                    <p class="caption">Late night dance moves with a neon backdrop! 🔥💃 #dance #citylife #neon #foryou</p>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <i class="fas fa-music"></i>
+                        <marquee style="width:150px; font-size:12px;">Neon Grooves - Midnight Beats</marquee>
+                    </div>
+                </div>
+            </div>
+
+            <div class="side-actions">
+                <div class="action-item" onclick="alert('Profile opened')">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" style="width:45px; height:45px; border-radius:50%; border:2px solid white;">
+                    <i class="fas fa-plus" style="position:absolute; bottom:-10px; left:15px; color:white; background:red; border-radius:50%; padding:2px;"></i>
+                </div>
+                <div class="action-item" onclick="alert('Liked!')">
+                    <i class="fas fa-heart" style="color:#fe2c55;"></i>
+                    <span>1.4M</span>
+                </div>
+                <div class="
